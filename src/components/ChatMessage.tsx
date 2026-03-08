@@ -19,16 +19,16 @@ const ChatMessage = ({ message }: Props) => {
         {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
       </div>
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`max-w-[85%] rounded-2xl px-5 py-4 text-base leading-relaxed ${
           isUser
             ? "bg-primary text-primary-foreground rounded-tr-sm"
             : "glass rounded-tl-sm"
         }`}
       >
         {isUser ? (
-          <p>{message.content}</p>
+          <p className="text-base">{message.content}</p>
         ) : (
-          <div className="prose prose-sm prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>h1]:text-foreground [&>h2]:text-foreground [&>h3]:text-foreground [&>p]:text-foreground/90 [&>li]:text-foreground/90 [&_strong]:text-primary">
+          <div className="prose prose-base prose-invert max-w-none [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3 [&>h1]:text-foreground [&>h2]:text-foreground [&>h3]:text-foreground [&>p]:text-foreground/90 [&>p]:text-base [&>li]:text-foreground/90 [&>li]:text-base [&_strong]:text-primary">
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </div>
         )}

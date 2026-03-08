@@ -35,7 +35,7 @@ const QuickActions = ({ onAction }: Props) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
             onClick={() => onAction(action.id)}
-            className="glass hover:border-primary/50 text-foreground/80 hover:text-primary text-xs px-3 py-2 rounded-full flex items-center gap-1.5 transition-colors"
+            className="glass hover:border-primary/50 text-foreground/80 hover:text-primary text-sm px-4 py-2.5 rounded-full flex items-center gap-2 transition-colors"
           >
             {Icon && <Icon className="w-3.5 h-3.5" />}
             {action.label}
