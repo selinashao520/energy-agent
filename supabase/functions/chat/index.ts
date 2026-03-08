@@ -74,7 +74,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: "abab6.5s-chat",
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            { role: "system", content: SYSTEM_PROMPT + (lang ? `\n\n当前用户语言设置: ${lang === 'en' ? '英文' : '中文'}，请用${lang === 'en' ? '英文' : '中文'}回答。` : '') },
             ...messages,
           ],
           stream: true,
