@@ -23,7 +23,7 @@ const FloatingParticle = ({ delay, x, y, size }: { delay: number; x: string; y: 
 );
 
 const Index = () => {
-  const registerUrl = `${window.location.origin}/register`;
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-main flex flex-col items-center justify-center relative overflow-hidden px-4 scanlines">
