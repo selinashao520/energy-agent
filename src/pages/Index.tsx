@@ -109,7 +109,7 @@ const Index = () => {
           <Shield className="w-4 h-4 text-accent/60" />
         </motion.div>
 
-        {/* QR Code with neon frame */}
+        {/* CTA Button */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -117,25 +117,17 @@ const Index = () => {
           className="flex flex-col items-center gap-4"
         >
           <div className="relative group">
-            {/* Outer glow ring */}
-            <div className="absolute -inset-3 rounded-3xl bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 blur-xl animate-pulse-glow pointer-events-none" />
-            <div className="relative glass-heavy rounded-2xl p-5 neon-border">
-              <QRCodeSVG
-                value={registerUrl}
-                size={180}
-                bgColor="transparent"
-                fgColor="hsl(192, 100%, 55%)"
-                level="M"
-              />
-            </div>
+            <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 blur-xl animate-pulse-glow pointer-events-none" />
+            <motion.button
+              onClick={() => navigate("/register")}
+              className="relative glass-heavy rounded-full px-10 py-4 neon-border flex items-center gap-3 text-lg font-bold text-primary tracking-wide hover:bg-primary/10 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              开始与 AI 能源顾问对话
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
           </div>
-          <motion.p
-            className="text-sm text-primary/70 tracking-wide"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            ▸ 扫码开始与 AI 能源顾问对话 ◂
-          </motion.p>
         </motion.div>
       </motion.div>
 
