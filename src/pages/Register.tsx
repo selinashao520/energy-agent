@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Phone } from "lucide-react";
+import { User, Phone, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 const Register = () => {
@@ -34,76 +34,118 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-main flex flex-col items-center justify-center relative overflow-hidden px-4">
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent/5 blur-[100px] pointer-events-none" />
+    <div className="min-h-screen bg-gradient-main flex flex-col items-center justify-center relative overflow-hidden px-4 scanlines">
+      {/* Grid */}
+      <div className="absolute inset-0 bg-grid opacity-50" />
+
+      {/* Orbs */}
+      <motion.div
+        className="absolute top-[20%] left-[20%] w-[400px] h-[400px] rounded-full blur-[150px] pointer-events-none"
+        style={{ background: "radial-gradient(circle, hsl(192 100% 50% / 0.07), transparent 70%)" }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 7, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-[15%] right-[15%] w-[350px] h-[350px] rounded-full blur-[120px] pointer-events-none"
+        style={{ background: "radial-gradient(circle, hsl(152 100% 50% / 0.05), transparent 70%)" }}
+        animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 5, repeat: Infinity }}
+      />
+
+      {/* Corner accents */}
+      <div className="absolute top-0 left-0 w-24 h-24 border-l-2 border-t-2 border-primary/20 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-24 h-24 border-r-2 border-b-2 border-accent/20 pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="glass rounded-2xl p-8 w-full max-w-sm z-10 border border-border/40"
+        className="relative z-10 w-full max-w-sm"
       >
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gradient mb-1">鲲腾能科</h1>
-          <p className="text-sm text-muted-foreground">
-            请输入您的信息以开始对话
-          </p>
+        {/* Outer glow */}
+        <div className="absolute -inset-4 rounded-3xl bg-gradient-to-b from-primary/10 via-transparent to-accent/5 blur-2xl pointer-events-none" />
+
+        <div className="relative glass-heavy rounded-2xl p-8 neon-border overflow-hidden">
+          {/* Top decorative bar */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+          <div className="text-center mb-7">
+            <motion.div
+              className="flex items-center justify-center gap-2 mb-3"
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
+              <Zap className="w-4 h-4 text-primary/60" />
+              <div className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
+            </motion.div>
+            <h1 className="text-2xl font-black text-gradient-bright tracking-wider mb-2">鲲腾能科</h1>
+            <p className="text-xs text-primary/50 tracking-[0.2em] uppercase" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+              Identity Verification
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-foreground/70 text-xs tracking-wider uppercase">
+                姓名 / Name
+              </Label>
+              <div className="relative group">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50 group-focus-within:text-primary transition-colors" />
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="请输入姓名"
+                  maxLength={50}
+                  className="pl-10 bg-background/40 border-primary/20 focus:border-primary/60 focus:ring-primary/20 transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-foreground/70 text-xs tracking-wider uppercase">
+                手机号 / Phone
+              </Label>
+              <div className="relative group">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50 group-focus-within:text-primary transition-colors" />
+                <Input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="请输入手机号"
+                  maxLength={20}
+                  type="tel"
+                  className="pl-10 bg-background/40 border-primary/20 focus:border-primary/60 focus:ring-primary/20 transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 glow-primary rounded-full font-bold py-5 tracking-wider text-sm uppercase transition-all duration-300 hover:glow-intense"
+            >
+              进入对话 · Enter →
+            </Button>
+          </form>
+
+          {/* Bottom decorative bar */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-foreground/80 text-sm">
-              姓名
-            </Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="请输入姓名"
-                maxLength={50}
-                className="pl-10 bg-background/50 border-border/50 focus:border-primary"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone" className="text-foreground/80 text-sm">
-              手机号
-            </Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="请输入手机号"
-                maxLength={20}
-                type="tel"
-                className="pl-10 bg-background/50 border-border/50 focus:border-primary"
-              />
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 glow-primary rounded-full font-semibold py-5"
-          >
-            进入对话 →
-          </Button>
-        </form>
       </motion.div>
 
-      <motion.p
-        className="absolute bottom-6 text-xs text-muted-foreground/50"
+      <motion.div
+        className="absolute bottom-6 flex flex-col items-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
       >
-        © 2025 鲲腾能科（上海）技术有限公司
-      </motion.p>
+        <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <p className="text-xs text-muted-foreground/40 tracking-wider">
+          © 2025 鲲腾能科（上海）技术有限公司
+        </p>
+      </motion.div>
     </div>
   );
 };
