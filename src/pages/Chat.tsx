@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
@@ -40,7 +40,6 @@ const Chat = () => {
   const sendMessage = async (input: string) => {
     if (isLoading) return;
 
-    // Check for lead form trigger
     if (input === "__LEAD_FORM__") {
       setShowLeadForm(true);
       return;
@@ -86,36 +85,50 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-main">
+    <div className="flex flex-col h-screen bg-gradient-main relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[180px] pointer-events-none"
+        style={{ background: "radial-gradient(circle, hsl(192 100% 50% / 0.05), transparent 70%)" }}
+      />
+
       {/* Header */}
-      <header className="glass border-b border-border/30 px-4 py-3 flex items-center gap-3 shrink-0">
+      <header className="relative glass-heavy border-b border-primary/10 px-4 py-3 flex items-center gap-3 shrink-0 z-20">
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate("/")}
-          className="text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
+        <Zap className="w-4 h-4 text-primary/60" />
         <div>
-          <h1 className="text-sm font-semibold text-foreground">鲲腾能科 AI 能源顾问</h1>
-          <p className="text-xs text-muted-foreground">KunTeng Energy · AI Consultant</p>
+          <h1 className="text-sm font-bold text-foreground tracking-wide" style={{ fontFamily: "'Orbitron', sans-serif" }}>
+            AI 能源顾问
+          </h1>
+          <p className="text-[10px] text-primary/50 tracking-[0.15em] uppercase">KunTeng Energy · Online</p>
         </div>
-        <div className="ml-auto w-2 h-2 rounded-full bg-accent animate-pulse" />
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-[10px] text-accent/60 tracking-wider uppercase">Live</span>
+          <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_hsl(152_100%_50%/0.6)] animate-pulse" />
+        </div>
       </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 z-10">
         {messages.map((msg, i) => (
           <ChatMessage key={i} message={msg} />
         ))}
 
         {isLoading && messages[messages.length - 1]?.role === "user" && (
           <div className="flex gap-2 items-center text-muted-foreground text-sm pl-2">
-            <div className="flex gap-1">
-              <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
-              <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
-              <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+            <div className="flex gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_6px_hsl(192_100%_50%/0.5)] animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_6px_hsl(192_100%_50%/0.5)] animate-bounce" style={{ animationDelay: "150ms" }} />
+              <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_6px_hsl(192_100%_50%/0.5)] animate-bounce" style={{ animationDelay: "300ms" }} />
             </div>
           </div>
         )}
@@ -145,7 +158,10 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <ChatInput onSend={sendMessage} disabled={isLoading} />
+      <div className="relative z-20">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <ChatInput onSend={sendMessage} disabled={isLoading} />
+      </div>
     </div>
   );
 };
