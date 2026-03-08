@@ -12,6 +12,15 @@ import { toast } from "sonner";
 
 const Chat = () => {
   const navigate = useNavigate();
+  const visitor = sessionStorage.getItem("visitor");
+
+  useEffect(() => {
+    if (!visitor) {
+      navigate("/register", { replace: true });
+    }
+  }, [visitor, navigate]);
+
+  const visitorData = visitor ? JSON.parse(visitor) : null;
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: WELCOME_MESSAGE },
   ]);

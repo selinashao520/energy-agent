@@ -1,7 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Cpu, Rocket, Globe, Database } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { QRCodeSVG } from "qrcode.react";
 
 const features = [
   { icon: Cpu, label: "模块化技术包", desc: "即插即用解决方案" },
@@ -11,7 +10,7 @@ const features = [
 ];
 
 const Index = () => {
-  const navigate = useNavigate();
+  const registerUrl = `${window.location.origin}/register`;
 
   return (
     <div className="min-h-screen bg-gradient-main flex flex-col items-center justify-center relative overflow-hidden px-4">
@@ -52,24 +51,29 @@ const Index = () => {
           中国绿色能源技术 · 赋能全球碳中和
         </motion.p>
 
+        {/* QR Code */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
+          className="flex flex-col items-center gap-3"
         >
-          <Button
-            size="lg"
-            onClick={() => navigate("/chat")}
-            className="text-lg px-10 py-6 bg-primary text-primary-foreground hover:bg-primary/90 glow-primary rounded-full font-semibold"
-          >
-            开始对话 →
-          </Button>
+          <div className="glass rounded-2xl p-4 inline-block border border-border/40">
+            <QRCodeSVG
+              value={registerUrl}
+              size={180}
+              bgColor="transparent"
+              fgColor="hsl(187, 100%, 50%)"
+              level="M"
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">扫码开始与 AI 能源顾问对话</p>
         </motion.div>
       </motion.div>
 
       {/* Feature icons */}
       <motion.div
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-16 z-10 w-full max-w-3xl"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-12 z-10 w-full max-w-3xl"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.6 }}
