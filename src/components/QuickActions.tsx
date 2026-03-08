@@ -25,19 +25,21 @@ const actions = [
 
 const QuickActions = ({ onAction }: Props) => {
   return (
-    <div className="flex flex-wrap gap-2 pl-11">
+    <div className="flex flex-wrap gap-3 pl-14">
       {actions.map((action, i) => {
         const Icon = iconMap[action.icon];
         return (
           <motion.button
             key={action.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            initial={{ opacity: 0, y: 12, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: i * 0.08, type: "spring", stiffness: 200, damping: 15 }}
+            whileHover={{ scale: 1.08, y: -2 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => onAction(action.id)}
-            className="glass hover:border-primary/50 text-foreground/80 hover:text-primary text-base px-5 py-3 rounded-full flex items-center gap-2.5 transition-colors"
+            className="glass hover:border-primary/50 hover:glow-primary text-foreground/80 hover:text-primary text-base px-5 py-3 rounded-full flex items-center gap-2.5 transition-all duration-200"
           >
-            {Icon && <Icon className="w-3.5 h-3.5" />}
+            {Icon && <Icon className="w-4 h-4" />}
             {action.label}
           </motion.button>
         );
