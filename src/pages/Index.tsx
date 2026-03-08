@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Cpu, Rocket, Globe, Database, Zap, Shield } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { Cpu, Rocket, Globe, Database, Zap, Shield, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   { icon: Cpu, label: "模块化技术包", desc: "即插即用解决方案" },
