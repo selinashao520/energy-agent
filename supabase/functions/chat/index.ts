@@ -57,7 +57,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, lang } = await req.json();
     const MINIMAX_API_KEY = Deno.env.get("MINIMAX_API_KEY");
     if (!MINIMAX_API_KEY) {
       throw new Error("MINIMAX_API_KEY is not configured");
