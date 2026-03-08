@@ -6,13 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
-
-const leadSchema = z.object({
-  contact_person: z.string().trim().min(1, "请填写联系人姓名").max(100),
-  company_name: z.string().trim().max(200).optional(),
-  contact_info: z.string().trim().min(1, "请填写联系方式").max(200),
-  requirements: z.string().trim().max(2000).optional(),
-});
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   onClose: () => void;
@@ -20,6 +14,15 @@ interface Props {
 }
 
 const LeadForm = ({ onClose, onSuccess }: Props) => {
+  const { t } = useLanguage();
+
+  const leadSchema = z.object({
+    contact_person: z.string().trim().min(1, t("lead.nameError")).max(100),
+    company_name: z.string().trim().max(200).optional(),
+    contact_info: z.string().trim().min(1, t("lead.contactError")).max(200),
+    requirements: z.string().trim().max(2000).optional(),
+  });
+
   const [form, setForm] = useState({
     contact_person: "",
     company_name: "",
@@ -46,44 +49,44 @@ const LeadForm = ({ onClose, onSuccess }: Props) => {
 
     setSubmitting(false);
     if (error) {
-      toast.error("提交失败，请稍后重试");
+      toast.error(t("lead.submitError"));
       return;
     }
     onSuccess();
   };
 
   return (
-    <div className="ml-11 glass rounded-2xl p-5 max-w-sm">
+    <div className="ml-14 glass rounded-2xl p-5 max-w-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground">📋 留下您的需求</h3>
+        <h3 className="text-base font-semibold text-foreground">{t("lead.title")}</h3>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
           <X className="w-4 h-4" />
         </button>
       </div>
       <form onSubmit={handleSubmit} className="space-y-3">
         <Input
-          placeholder="联系人姓名 *"
+          placeholder={t("lead.contactPerson")}
           value={form.contact_person}
           onChange={(e) => setForm({ ...form, contact_person: e.target.value })}
-          className="bg-secondary/50 border-border/50 text-sm"
+          className="bg-secondary/50 border-border/50 text-base"
         />
         <Input
-          placeholder="公司名称"
+          placeholder={t("lead.companyName")}
           value={form.company_name}
           onChange={(e) => setForm({ ...form, company_name: e.target.value })}
-          className="bg-secondary/50 border-border/50 text-sm"
+          className="bg-secondary/50 border-border/50 text-base"
         />
         <Input
-          placeholder="手机/微信/邮箱 *"
+          placeholder={t("lead.contactInfo")}
           value={form.contact_info}
           onChange={(e) => setForm({ ...form, contact_info: e.target.value })}
-          className="bg-secondary/50 border-border/50 text-sm"
+          className="bg-secondary/50 border-border/50 text-base"
         />
         <Textarea
-          placeholder="您的需求或感兴趣的方向"
+          placeholder={t("lead.requirements")}
           value={form.requirements}
           onChange={(e) => setForm({ ...form, requirements: e.target.value })}
-          className="bg-secondary/50 border-border/50 text-sm min-h-[60px]"
+          className="bg-secondary/50 border-border/50 text-base min-h-[60px]"
           rows={2}
         />
         <Button
@@ -91,7 +94,7 @@ const LeadForm = ({ onClose, onSuccess }: Props) => {
           disabled={submitting}
           className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
         >
-          {submitting ? "提交中..." : "提交需求"}
+          {submitting ? t("lead.submitting") : t("lead.submit")}
         </Button>
       </form>
     </div>

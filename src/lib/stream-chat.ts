@@ -4,11 +4,13 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 export async function streamChat({
   messages,
+  lang,
   onDelta,
   onDone,
   onError,
 }: {
   messages: ChatMessage[];
+  lang?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   onError: (error: string) => void;
@@ -20,19 +22,19 @@ export async function streamChat({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, lang }),
     });
 
     if (resp.status === 429) {
-      onError('请求过于频繁，请稍后再试');
+      onError(lang === 'en' ? 'Too many requests. Please try again later.' : '请求过于频繁，请稍后再试');
       return;
     }
     if (resp.status === 402) {
-      onError('服务额度已用完，请联系管理员');
+      onError(lang === 'en' ? 'Service quota exceeded.' : '服务额度已用完，请联系管理员');
       return;
     }
     if (!resp.ok || !resp.body) {
-      onError('连接AI服务失败，请稍后重试');
+      onError(lang === 'en' ? 'Failed to connect to AI service.' : '连接AI服务失败，请稍后重试');
       return;
     }
 
@@ -91,6 +93,6 @@ export async function streamChat({
 
     onDone();
   } catch (e) {
-    onError('网络连接失败，请检查网络后重试');
+    onError(lang === 'en' ? 'Network error. Please check your connection.' : '网络连接失败，请检查网络后重试');
   }
 }

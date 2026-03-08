@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Props {
   onSend: (message: string) => void;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 const ChatInput = ({ onSend, disabled }: Props) => {
+  const { t } = useLanguage();
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,10 +36,10 @@ const ChatInput = ({ onSend, disabled }: Props) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="输入您的问题..."
+          placeholder={t("chat.inputPlaceholder")}
           rows={1}
           disabled={disabled}
-          className="flex-1 bg-secondary/50 text-foreground text-sm rounded-xl px-4 py-3 resize-none outline-none focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground disabled:opacity-50 max-h-32"
+          className="flex-1 bg-secondary/50 text-foreground text-base rounded-xl px-4 py-3 resize-none outline-none focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground disabled:opacity-50 max-h-32"
           style={{ minHeight: "44px" }}
         />
         <Button

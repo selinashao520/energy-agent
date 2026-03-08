@@ -7,12 +7,13 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import QuickActions from "@/components/QuickActions";
 import LeadForm from "@/components/LeadForm";
-import { WELCOME_MESSAGE, QUICK_ACTIONS } from "@/data/knowledge";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { streamChat, type ChatMessage as Msg } from "@/lib/stream-chat";
 import { toast } from "sonner";
 
 const Chat = () => {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   const visitor = sessionStorage.getItem("visitor");
 
   useEffect(() => {
@@ -23,12 +24,22 @@ const Chat = () => {
 
   const visitorData = visitor ? JSON.parse(visitor) : null;
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: WELCOME_MESSAGE },
+    { role: "assistant", content: t("chat.welcome") },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Update welcome message when language changes
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].role === "assistant") {
+        return [{ role: "assistant", content: t("chat.welcome") }];
+      }
+      return prev;
+    });
+  }, [lang, t]);
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -67,6 +78,7 @@ const Chat = () => {
 
     await streamChat({
       messages: [...messages, userMsg],
+      lang,
       onDelta: upsertAssistant,
       onDone: () => {
         setIsLoading(false);
@@ -81,8 +93,15 @@ const Chat = () => {
   };
 
   const handleQuickAction = (actionId: string) => {
-    const action = QUICK_ACTIONS.find((a) => a.id === actionId);
-    if (action) sendMessage(action.prompt);
+    if (actionId === "contact") {
+      sendMessage("__LEAD_FORM__");
+      return;
+    }
+    const promptKey = `prompt.${actionId}`;
+    const prompt = t(promptKey);
+    if (prompt && prompt !== promptKey) {
+      sendMessage(prompt);
+    }
   };
 
   return (
@@ -92,10 +111,8 @@ const Chat = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Background effects */}
       <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
-      
-      {/* Animated ambient orbs */}
+
       <motion.div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[180px] pointer-events-none"
         style={{ background: "radial-gradient(circle, hsl(192 100% 50% / 0.08), transparent 70%)" }}
@@ -109,7 +126,6 @@ const Chat = () => {
         transition={{ duration: 8, repeat: Infinity }}
       />
 
-      {/* Scan line animation */}
       <motion.div
         className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none z-30"
         initial={{ top: "-1px" }}
@@ -117,7 +133,6 @@ const Chat = () => {
         transition={{ duration: 4, repeat: Infinity, ease: "linear", repeatDelay: 2 }}
       />
 
-      {/* Header - slide down */}
       <motion.header
         className="relative glass-heavy border-b border-primary/10 px-4 py-3 flex items-center gap-3 shrink-0 z-20"
         initial={{ y: -60, opacity: 0 }}
@@ -142,9 +157,9 @@ const Chat = () => {
         </motion.div>
         <div>
           <h1 className="text-sm font-bold text-foreground tracking-wide" style={{ fontFamily: "'Orbitron', sans-serif" }}>
-            AI 能源顾问
+            {t("chat.title")}
           </h1>
-          <p className="text-[10px] text-primary/50 tracking-[0.15em] uppercase">KunTeng Energy · Online</p>
+          <p className="text-[10px] text-primary/50 tracking-[0.15em] uppercase">{t("chat.status")}</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <motion.span
@@ -152,13 +167,12 @@ const Chat = () => {
             animate={{ opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Live
+            {t("chat.live")}
           </motion.span>
           <div className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_10px_hsl(152_100%_50%/0.6)] animate-pulse" />
         </div>
       </motion.header>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 z-10">
         <AnimatePresence mode="popLayout">
           {messages.map((msg, i) => (
@@ -209,11 +223,7 @@ const Chat = () => {
                 setShowLeadForm(false);
                 setMessages((prev) => [
                   ...prev,
-                  {
-                    role: "assistant",
-                    content:
-                      "感谢您留下联系方式！🎉 我们的专业团队会尽快与您联系。\n\n如果您希望立即沟通，也可以直接联系我们：\n- 📞 +86-15202136096\n- 📧 selinashao@kuntengenergy.com",
-                  },
+                  { role: "assistant", content: t("lead.success") },
                 ]);
               }}
             />
@@ -223,7 +233,6 @@ const Chat = () => {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input - slide up */}
       <motion.div
         className="relative z-20"
         initial={{ y: 60, opacity: 0 }}
