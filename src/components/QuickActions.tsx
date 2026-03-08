@@ -1,5 +1,6 @@
 import { Building2, Zap, Globe, TrendingUp, Brain, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const iconMap: Record<string, React.ElementType> = {
   Building2,
@@ -14,20 +15,23 @@ interface Props {
   onAction: (actionId: string) => void;
 }
 
-const actions = [
-  { id: "company", label: "了解公司", icon: "Building2" },
-  { id: "products", label: "产品服务", icon: "Zap" },
-  { id: "cases", label: "成功案例", icon: "Globe" },
-  { id: "trends", label: "行业趋势", icon: "TrendingUp" },
-  { id: "ai", label: "鲲腾AI", icon: "Brain" },
-  { id: "contact", label: "留下需求", icon: "MessageSquare" },
+const actionKeys = [
+  { id: "company", icon: "Building2" },
+  { id: "products", icon: "Zap" },
+  { id: "cases", icon: "Globe" },
+  { id: "trends", icon: "TrendingUp" },
+  { id: "ai", icon: "Brain" },
+  { id: "contact", icon: "MessageSquare" },
 ];
 
 const QuickActions = ({ onAction }: Props) => {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-wrap gap-3 pl-14">
-      {actions.map((action, i) => {
+      {actionKeys.map((action, i) => {
         const Icon = iconMap[action.icon];
+        const label = t(`action.${action.id}`);
         return (
           <motion.button
             key={action.id}
@@ -40,7 +44,7 @@ const QuickActions = ({ onAction }: Props) => {
             className="glass hover:border-primary/50 hover:glow-primary text-foreground/80 hover:text-primary text-base px-5 py-3 rounded-full flex items-center gap-2.5 transition-all duration-200"
           >
             {Icon && <Icon className="w-4 h-4" />}
-            {action.label}
+            {label}
           </motion.button>
         );
       })}

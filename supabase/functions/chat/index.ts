@@ -45,7 +45,7 @@ const SYSTEM_PROMPT = `你是"鲲腾能科AI能源顾问"，代表鲲腾能科�
 上海浦东 | +86-15202136096 | selinashao@kuntengenergy.com | www.kuntengenergy.com
 
 ## 规则
-1. 用中文回答，访客用英文则用英文
+1. 根据lang参数决定回答语言：lang=zh用中文，lang=en用英文。如果没有lang参数，访客用什么语言就用什么语言回答
 2. 每次回答控制在200字以内
 3. 适时推荐产品服务
 4. 对话3轮后自然引导留下联系方式
@@ -57,7 +57,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, lang } = await req.json();
     const MINIMAX_API_KEY = Deno.env.get("MINIMAX_API_KEY");
     if (!MINIMAX_API_KEY) {
       throw new Error("MINIMAX_API_KEY is not configured");
@@ -74,7 +74,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: "abab6.5s-chat",
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            { role: "system", content: SYSTEM_PROMPT + (lang ? `\n\n当前用户语言设置: ${lang === 'en' ? '英文' : '中文'}，请用${lang === 'en' ? '英文' : '中文'}回答。` : '') },
             ...messages,
           ],
           stream: true,
