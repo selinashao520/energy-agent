@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import heroPoster from "@/assets/hero-poster.jpg";
 import energyNetwork from "@/assets/energy-network.jpg";
+
+const SITE_URL = "https://energy-agent.lovable.app";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -95,6 +98,25 @@ const Index = () => {
               <ArrowRight className="w-6 h-6" />
             </motion.button>
           </div>
+        </motion.div>
+
+        {/* QR Code for screen projection scanning */}
+        <motion.div
+          className="mt-8 flex flex-col items-center gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.5 }}
+        >
+          <div className="glass rounded-xl p-3 border border-primary/20">
+            <QRCodeSVG
+              value={SITE_URL}
+              size={120}
+              bgColor="transparent"
+              fgColor="hsl(192, 100%, 70%)"
+              level="M"
+            />
+          </div>
+          <p className="text-xs text-primary/60 tracking-wider">{t("index.scanQr") || "扫码访问"}</p>
         </motion.div>
       </div>
 
