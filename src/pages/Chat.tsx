@@ -94,9 +94,8 @@ const Chat = () => {
       return;
     }
 
-    const searchKeywords = /最新|最近|今日|今天|本周|本月|2024|2025|2026|latest|recent|today|news|trending|动态|资讯|热点|实时/i;
-    const isSearch = input.startsWith("__SEARCH__") || searchKeywords.test(input);
-    const displayText = input.startsWith("__SEARCH__") ? input.replace("__SEARCH__", "") : input;
+    const isSearch = input.startsWith("__SEARCH__");
+    const displayText = isSearch ? input.replace("__SEARCH__", "") : input;
 
     setShowQuickActions(false);
     const userMsg: Msg = { role: "user", content: displayText };
