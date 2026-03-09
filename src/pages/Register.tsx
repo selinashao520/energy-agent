@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -7,14 +7,46 @@ import { Label } from "@/components/ui/label";
 import { User, Phone, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [checking, setChecking] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Check if this IP already registered
+  useEffect(() => {
+    const checkVisitor = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("check-visitor");
+        if (!error && data?.visitor) {
+          // IP already registered, auto-login
+          sessionStorage.setItem(
+            "visitor",
+            JSON.stringify({ name: data.visitor.name, phone: data.visitor.phone })
+          );
+          navigate("/chat", { replace: true });
+          return;
+        }
+      } catch (e) {
+        console.error("check-visitor error:", e);
+      }
+      setChecking(false);
+    };
+    
+    // If already has session, go to chat
+    const existing = sessionStorage.getItem("visitor");
+    if (existing) {
+      navigate("/chat", { replace: true });
+      return;
+    }
+    
+    checkVisitor();
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = name.trim();
     const trimmedPhone = phone.trim();
@@ -32,8 +64,30 @@ const Register = () => {
       "visitor",
       JSON.stringify({ name: trimmedName, phone: trimmedPhone })
     );
+
+    // Register visitor with IP and send email notification (non-blocking)
+    supabase.functions.invoke("register-visitor", {
+      body: { name: trimmedName, phone: trimmedPhone },
+    }).catch((e) => console.error("register-visitor error:", e));
+
     navigate("/chat");
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-gradient-main flex items-center justify-center">
+        <motion.div
+          className="flex gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <span className="w-3 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="w-3 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="w-3 h-3 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-main flex flex-col items-center justify-center relative overflow-hidden px-4 scanlines">

@@ -40,12 +40,21 @@ const LeadForm = ({ onClose, onSuccess }: Props) => {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.from("leads").insert({
+    const trimmedData = {
       contact_person: form.contact_person.trim(),
       company_name: form.company_name.trim() || null,
       contact_info: form.contact_info.trim(),
       requirements: form.requirements.trim() || null,
-    });
+    };
+
+    const { error } = await supabase.from("leads").insert(trimmedData);
+
+    if (!error) {
+      // Send email notification (non-blocking)
+      supabase.functions.invoke("notify-lead", {
+        body: trimmedData,
+      }).catch((e) => console.error("notify-lead error:", e));
+    }
 
     setSubmitting(false);
     if (error) {
