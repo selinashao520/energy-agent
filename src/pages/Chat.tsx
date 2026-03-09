@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import ChatMessage from "@/components/ChatMessage";
+import ChatMessage, { type SourceLink } from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import QuickActions from "@/components/QuickActions";
 import LeadForm from "@/components/LeadForm";
