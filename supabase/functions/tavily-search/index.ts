@@ -14,9 +14,9 @@ serve(async (req) => {
   try {
     const { query, maxResults = 5 } = await req.json();
     
-    const TAVILY_API_KEY = Deno.env.get("TAVILY_MCP_URL");
+    const TAVILY_API_KEY = Deno.env.get("TAVILY_API_KEY");
     if (!TAVILY_API_KEY) {
-      throw new Error("TAVILY API KEY is not configured");
+      throw new Error("TAVILY_API_KEY is not configured");
     }
 
     const response = await fetch("https://api.tavily.com/search", {
