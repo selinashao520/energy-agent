@@ -42,31 +42,34 @@ serve(async (req) => {
 
     if (dbError) throw dbError;
 
-    // Send email notification
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (RESEND_API_KEY) {
+    // Send Feishu notification
+    const FEISHU_WEBHOOK_URL = Deno.env.get("FEISHU_WEBHOOK_URL");
+    if (FEISHU_WEBHOOK_URL) {
       const now = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-      await fetch("https://api.resend.com/emails", {
+      await fetch(FEISHU_WEBHOOK_URL, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "鲲腾能科通知 <onboarding@resend.dev>",
-          to: "s15202136096@mail.com",
-          subject: `【新访客登录】${name} - ${phone}`,
-          html: `
-            <h2>新访客登录通知</h2>
-            <table style="border-collapse:collapse;width:100%;max-width:400px">
-              <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">姓名</td><td style="padding:8px;border:1px solid #ddd">${name}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">手机号</td><td style="padding:8px;border:1px solid #ddd">${phone}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">IP地址</td><td style="padding:8px;border:1px solid #ddd">${clientIp}</td></tr>
-              <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">时间</td><td style="padding:8px;border:1px solid #ddd">${now}</td></tr>
-            </table>
-          `,
+          msg_type: "interactive",
+          card: {
+            header: {
+              title: { tag: "plain_text", content: "👤 新访客登录通知" },
+              template: "green",
+            },
+            elements: [
+              {
+                tag: "div",
+                fields: [
+                  { is_short: true, text: { tag: "lark_md", content: `**姓名**\n${name}` } },
+                  { is_short: true, text: { tag: "lark_md", content: `**手机号**\n${phone}` } },
+                  { is_short: true, text: { tag: "lark_md", content: `**IP地址**\n${clientIp}` } },
+                  { is_short: true, text: { tag: "lark_md", content: `**时间**\n${now}` } },
+                ],
+              },
+            ],
+          },
         }),
-      }).catch((e) => console.error("Email send failed:", e));
+      }).catch((e) => console.error("Feishu notify failed:", e));
     }
 
     return new Response(
