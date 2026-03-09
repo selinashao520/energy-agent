@@ -239,7 +239,7 @@ const Chat = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.4, delay: i === 0 ? 0.3 : 0, type: "spring", stiffness: 150, damping: 20 }}
             >
-              <ChatMessage message={msg} />
+              <ChatMessage message={msg} sources={sourcesMap[i]} />
             </motion.div>
           ))}
         </AnimatePresence>
