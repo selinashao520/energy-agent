@@ -30,6 +30,7 @@ const Chat = () => {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
   const [sourcesMap, setSourcesMap] = useState<Record<number, SourceLink[]>>({});
+  const pendingSourcesRef = useRef<SourceLink[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Update welcome message when language changes
@@ -102,13 +103,13 @@ const Chat = () => {
     setIsLoading(true);
 
     let chatMessages = [...messages, userMsg];
-    let searchSources: SourceLink[] = [];
+    pendingSourcesRef.current = [];
 
     // If search query, enrich with Tavily results
     if (isSearch) {
       const result = await searchAndChat(displayText, chatMessages);
       chatMessages = result.messages;
-      searchSources = result.sources;
+      pendingSourcesRef.current = result.sources;
     }
 
     let assistantSoFar = "";
@@ -130,13 +131,16 @@ const Chat = () => {
       lang,
       onDelta: upsertAssistant,
       onDone: () => {
-        // Attach sources to the assistant message index
-        if (searchSources.length > 0) {
+        if (pendingSourcesRef.current.length > 0) {
+          const sources = pendingSourcesRef.current;
           setMessages((prev) => {
-            const assistantIdx = prev.length - 1;
-            setSourcesMap((sm) => ({ ...sm, [assistantIdx]: searchSources }));
+            const idx = prev.length - 1;
+            if (prev[idx]?.role === 'assistant') {
+              setSourcesMap((sm) => ({ ...sm, [idx]: sources }));
+            }
             return prev;
           });
+          pendingSourcesRef.current = [];
         }
         setIsLoading(false);
         setShowQuickActions(true);
