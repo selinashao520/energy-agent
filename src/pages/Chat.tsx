@@ -29,6 +29,7 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
+  const [sourcesMap, setSourcesMap] = useState<Record<number, SourceLink[]>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Update welcome message when language changes
