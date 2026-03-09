@@ -130,6 +130,14 @@ const Chat = () => {
       lang,
       onDelta: upsertAssistant,
       onDone: () => {
+        // Attach sources to the assistant message index
+        if (searchSources.length > 0) {
+          setMessages((prev) => {
+            const assistantIdx = prev.length - 1;
+            setSourcesMap((sm) => ({ ...sm, [assistantIdx]: searchSources }));
+            return prev;
+          });
+        }
         setIsLoading(false);
         setShowQuickActions(true);
       },
