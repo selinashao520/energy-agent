@@ -102,10 +102,13 @@ const Chat = () => {
     setIsLoading(true);
 
     let chatMessages = [...messages, userMsg];
+    let searchSources: SourceLink[] = [];
 
     // If search query, enrich with Tavily results
     if (isSearch) {
-      chatMessages = await searchAndChat(displayText, chatMessages);
+      const result = await searchAndChat(displayText, chatMessages);
+      chatMessages = result.messages;
+      searchSources = result.sources;
     }
 
     let assistantSoFar = "";
