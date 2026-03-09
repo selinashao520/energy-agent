@@ -48,6 +48,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "action.products": "产品服务",
     "action.cases": "成功案例",
     "action.trends": "行业趋势",
+    "action.esg": "ESG碳资讯",
+    "action.carbon": "碳排查",
     "action.ai": "鲲腾AI",
     "action.contact": "留下需求",
 
@@ -56,6 +58,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "prompt.products": "鲲腾能科有哪些主要产品和服务？",
     "prompt.cases": "能分享一些鲲腾能科的成功案例吗？",
     "prompt.trends": "当前新能源行业有哪些重要趋势？",
+    "prompt.esg": "__SEARCH__请搜索最新的ESG和碳排放相关资讯",
+    "prompt.carbon": "介绍一下企业碳排查和碳核算的基本流程？",
     "prompt.ai": "鲲腾AI板块包含哪些内容？",
 
     // Welcome message
