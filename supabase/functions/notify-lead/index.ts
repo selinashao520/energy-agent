@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SmtpClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import { createTransport } from "npm:nodemailer@6.9.9";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,19 +24,21 @@ serve(async (req) => {
 
     const now = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
-    const client = new SmtpClient();
-    await client.connectTLS({
-      hostname: "smtp.qq.com",
+    const transporter = createTransport({
+      host: "smtp.qq.com",
       port: 465,
-      username: SMTP_USER,
-      password: SMTP_PASS,
+      secure: true,
+      auth: {
+        user: SMTP_USER,
+        pass: SMTP_PASS,
+      },
     });
 
-    await client.send({
-      from: SMTP_USER,
+    await transporter.sendMail({
+      from: `"线索通知" <${SMTP_USER}>`,
       to: SMTP_USER,
       subject: "📋 新需求线索通知",
-      content: `
+      text: `
 新需求线索已提交，详情如下：
 
 联系人：${contact_person}
@@ -73,8 +75,6 @@ serve(async (req) => {
 </div>
       `,
     });
-
-    await client.close();
 
     return new Response(
       JSON.stringify({ success: true }),
