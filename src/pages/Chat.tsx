@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import ChatMessage from "@/components/ChatMessage";
+import ChatMessage, { type SourceLink } from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import QuickActions from "@/components/QuickActions";
 import LeadForm from "@/components/LeadForm";
@@ -29,6 +29,7 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
+  const [sourcesMap, setSourcesMap] = useState<Record<number, SourceLink[]>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Update welcome message when language changes
@@ -49,8 +50,7 @@ const Chat = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const searchAndChat = async (query: string, allMessages: Msg[]) => {
-    // Call tavily-search edge function
+  const searchAndChat = async (query: string, allMessages: Msg[]): Promise<{ messages: Msg[]; sources: SourceLink[] }> => {
     const searchUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tavily-search`;
     try {
       const res = await fetch(searchUrl, {
@@ -65,23 +65,24 @@ const Chat = () => {
       if (data.success) {
         let searchContext = `\n\n[实时搜索结果]\n`;
         if (data.answer) searchContext += `摘要: ${data.answer}\n\n`;
+        const sources: SourceLink[] = [];
         if (data.results?.length) {
           data.results.forEach((r: any, i: number) => {
             searchContext += `${i + 1}. ${r.title}\n   ${r.content}\n   来源: ${r.url}\n\n`;
+            sources.push({ title: r.title, url: r.url });
           });
         }
-        // Inject search results into the last user message for the AI
         const enrichedMessages = allMessages.map((m, i) =>
           i === allMessages.length - 1 && m.role === 'user'
             ? { ...m, content: m.content + searchContext }
             : m
         );
-        return enrichedMessages;
+        return { messages: enrichedMessages, sources };
       }
     } catch (e) {
       console.error('Search failed:', e);
     }
-    return allMessages;
+    return { messages: allMessages, sources: [] };
   };
 
   const sendMessage = async (input: string) => {
@@ -101,10 +102,13 @@ const Chat = () => {
     setIsLoading(true);
 
     let chatMessages = [...messages, userMsg];
+    let searchSources: SourceLink[] = [];
 
     // If search query, enrich with Tavily results
     if (isSearch) {
-      chatMessages = await searchAndChat(displayText, chatMessages);
+      const result = await searchAndChat(displayText, chatMessages);
+      chatMessages = result.messages;
+      searchSources = result.sources;
     }
 
     let assistantSoFar = "";
@@ -126,6 +130,14 @@ const Chat = () => {
       lang,
       onDelta: upsertAssistant,
       onDone: () => {
+        // Attach sources to the assistant message index
+        if (searchSources.length > 0) {
+          setMessages((prev) => {
+            const assistantIdx = prev.length - 1;
+            setSourcesMap((sm) => ({ ...sm, [assistantIdx]: searchSources }));
+            return prev;
+          });
+        }
         setIsLoading(false);
         setShowQuickActions(true);
       },
@@ -227,7 +239,7 @@ const Chat = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.4, delay: i === 0 ? 0.3 : 0, type: "spring", stiffness: 150, damping: 20 }}
             >
-              <ChatMessage message={msg} />
+              <ChatMessage message={msg} sources={sourcesMap[i]} />
             </motion.div>
           ))}
         </AnimatePresence>
