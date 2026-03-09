@@ -131,17 +131,16 @@ const Chat = () => {
       lang,
       onDelta: upsertAssistant,
       onDone: () => {
-        if (searchSources.length > 0) {
-          // Use a timeout to ensure messages state is settled
-          setTimeout(() => {
-            setMessages((prev) => {
-              const assistantIdx = prev.length - 1;
-              if (prev[assistantIdx]?.role === 'assistant') {
-                setSourcesMap((sm) => ({ ...sm, [assistantIdx]: searchSources }));
-              }
-              return prev;
-            });
-          }, 0);
+        if (pendingSourcesRef.current.length > 0) {
+          const sources = pendingSourcesRef.current;
+          setMessages((prev) => {
+            const idx = prev.length - 1;
+            if (prev[idx]?.role === 'assistant') {
+              setSourcesMap((sm) => ({ ...sm, [idx]: sources }));
+            }
+            return prev;
+          });
+          pendingSourcesRef.current = [];
         }
         setIsLoading(false);
         setShowQuickActions(true);
