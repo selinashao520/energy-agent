@@ -55,6 +55,8 @@ export const QUICK_ACTIONS = [
   { id: 'products', label: '产品服务', icon: 'Zap', prompt: '鲲腾能科有哪些主要产品和服务？' },
   { id: 'cases', label: '成功案例', icon: 'Globe', prompt: '能分享一些鲲腾能科的成功案例吗？' },
   { id: 'trends', label: '行业趋势', icon: 'TrendingUp', prompt: '当前新能源行业有哪些重要趋势？' },
+  { id: 'esg', label: 'ESG碳资讯', icon: 'Leaf', prompt: '__SEARCH__请搜索最新的ESG和碳排放相关资讯' },
+  { id: 'carbon', label: '碳排查', icon: 'BarChart3', prompt: '介绍一下企业碳排查和碳核算的基本流程？' },
   { id: 'ai', label: '鲲腾AI', icon: 'Brain', prompt: '鲲腾AI板块包含哪些内容？' },
   { id: 'contact', label: '留下需求', icon: 'MessageSquare', prompt: '__LEAD_FORM__' },
 ];
