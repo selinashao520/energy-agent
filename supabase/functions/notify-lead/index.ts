@@ -14,39 +14,45 @@ serve(async (req) => {
   try {
     const { contact_person, company_name, contact_info, requirements } = await req.json();
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured");
+    const FEISHU_WEBHOOK_URL = Deno.env.get("FEISHU_WEBHOOK_URL");
+    if (!FEISHU_WEBHOOK_URL) {
+      throw new Error("FEISHU_WEBHOOK_URL is not configured");
     }
 
     const now = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetch(FEISHU_WEBHOOK_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "鲲腾能科通知 <onboarding@resend.dev>",
-        to: "s15202136096@mail.com",
-        subject: `【新需求线索】${contact_person}${company_name ? ` - ${company_name}` : ""}`,
-        html: `
-          <h2>新需求线索通知</h2>
-          <table style="border-collapse:collapse;width:100%;max-width:500px">
-            <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">联系人</td><td style="padding:8px;border:1px solid #ddd">${contact_person}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">公司名称</td><td style="padding:8px;border:1px solid #ddd">${company_name || "未填写"}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">联系方式</td><td style="padding:8px;border:1px solid #ddd">${contact_info}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">需求描述</td><td style="padding:8px;border:1px solid #ddd">${requirements || "未填写"}</td></tr>
-            <tr><td style="padding:8px;border:1px solid #ddd;font-weight:bold">提交时间</td><td style="padding:8px;border:1px solid #ddd">${now}</td></tr>
-          </table>
-        `,
+        msg_type: "interactive",
+        card: {
+          header: {
+            title: { tag: "plain_text", content: "📋 新需求线索通知" },
+            template: "blue",
+          },
+          elements: [
+            {
+              tag: "div",
+              fields: [
+                { is_short: true, text: { tag: "lark_md", content: `**联系人**\n${contact_person}` } },
+                { is_short: true, text: { tag: "lark_md", content: `**公司名称**\n${company_name || "未填写"}` } },
+                { is_short: true, text: { tag: "lark_md", content: `**联系方式**\n${contact_info || "未填写"}` } },
+                { is_short: true, text: { tag: "lark_md", content: `**提交时间**\n${now}` } },
+              ],
+            },
+            {
+              tag: "div",
+              text: { tag: "lark_md", content: `**需求描述**\n${requirements || "未填写"}` },
+            },
+          ],
+        },
       }),
     });
 
     if (!res.ok) {
       const body = await res.text();
-      throw new Error(`Resend API failed [${res.status}]: ${body}`);
+      throw new Error(`Feishu webhook failed [${res.status}]: ${body}`);
     }
 
     return new Response(
