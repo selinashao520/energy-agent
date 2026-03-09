@@ -14,69 +14,39 @@ serve(async (req) => {
   try {
     const { query, maxResults = 5 } = await req.json();
     
-    const TAVILY_MCP_URL = Deno.env.get("TAVILY_MCP_URL");
-    if (!TAVILY_MCP_URL) {
-      throw new Error("TAVILY_MCP_URL is not configured");
+    const TAVILY_API_KEY = Deno.env.get("TAVILY_MCP_URL");
+    if (!TAVILY_API_KEY) {
+      throw new Error("TAVILY API KEY is not configured");
     }
 
-    // Call Tavily MCP server with tools/call for search
-    const mcpRequest = {
-      jsonrpc: "2.0",
-      id: Date.now(),
-      method: "tools/call",
-      params: {
-        name: "tavily_search",
-        arguments: {
-          query: query,
-          max_results: maxResults,
-          search_depth: "advanced",
-          include_answer: true,
-          topic: "news"
-        }
-      }
-    };
-
-    const response = await fetch(TAVILY_MCP_URL, {
+    const response = await fetch("https://api.tavily.com/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json, text/event-stream",
       },
-      body: JSON.stringify(mcpRequest),
+      body: JSON.stringify({
+        api_key: TAVILY_API_KEY,
+        query: query,
+        max_results: maxResults,
+        search_depth: "advanced",
+        include_answer: true,
+        topic: "news"
+      }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Tavily MCP error:", response.status, errorText);
+      console.error("Tavily API error:", response.status, errorText);
       throw new Error(`Tavily search failed [${response.status}]: ${errorText}`);
     }
 
-    const result = await response.json();
-    
-    // Extract search results from MCP response
-    let searchResults = [];
-    let answer = "";
-    
-    if (result.result?.content) {
-      for (const item of result.result.content) {
-        if (item.type === "text") {
-          try {
-            const parsed = JSON.parse(item.text);
-            if (parsed.answer) answer = parsed.answer;
-            if (parsed.results) searchResults = parsed.results;
-          } catch {
-            // If not JSON, use as is
-            answer = item.text;
-          }
-        }
-      }
-    }
+    const data = await response.json();
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        answer,
-        results: searchResults.slice(0, maxResults).map((r: any) => ({
+        answer: data.answer || "",
+        results: (data.results || []).slice(0, maxResults).map((r: any) => ({
           title: r.title,
           url: r.url,
           content: r.content?.slice(0, 300),
