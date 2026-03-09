@@ -50,8 +50,7 @@ const Chat = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const searchAndChat = async (query: string, allMessages: Msg[]) => {
-    // Call tavily-search edge function
+  const searchAndChat = async (query: string, allMessages: Msg[]): Promise<{ messages: Msg[]; sources: SourceLink[] }> => {
     const searchUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tavily-search`;
     try {
       const res = await fetch(searchUrl, {
@@ -66,23 +65,24 @@ const Chat = () => {
       if (data.success) {
         let searchContext = `\n\n[实时搜索结果]\n`;
         if (data.answer) searchContext += `摘要: ${data.answer}\n\n`;
+        const sources: SourceLink[] = [];
         if (data.results?.length) {
           data.results.forEach((r: any, i: number) => {
             searchContext += `${i + 1}. ${r.title}\n   ${r.content}\n   来源: ${r.url}\n\n`;
+            sources.push({ title: r.title, url: r.url });
           });
         }
-        // Inject search results into the last user message for the AI
         const enrichedMessages = allMessages.map((m, i) =>
           i === allMessages.length - 1 && m.role === 'user'
             ? { ...m, content: m.content + searchContext }
             : m
         );
-        return enrichedMessages;
+        return { messages: enrichedMessages, sources };
       }
     } catch (e) {
       console.error('Search failed:', e);
     }
-    return allMessages;
+    return { messages: allMessages, sources: [] };
   };
 
   const sendMessage = async (input: string) => {
