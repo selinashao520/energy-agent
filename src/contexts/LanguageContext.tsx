@@ -123,6 +123,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "action.products": "Products",
     "action.cases": "Case Studies",
     "action.trends": "Trends",
+    "action.esg": "ESG & Carbon",
+    "action.carbon": "Carbon Audit",
     "action.ai": "KunTeng AI",
     "action.contact": "Contact Us",
 
@@ -131,6 +133,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "prompt.products": "What are the main products and services?",
     "prompt.cases": "Can you share some success stories?",
     "prompt.trends": "What are the key trends in new energy industry?",
+    "prompt.esg": "__SEARCH__Search for the latest ESG and carbon emission news",
+    "prompt.carbon": "Explain the basic process of corporate carbon auditing and accounting?",
     "prompt.ai": "What does KunTeng AI cover?",
 
     // Welcome message

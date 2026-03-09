@@ -1,4 +1,4 @@
-import { Building2, Zap, Globe, TrendingUp, Brain, MessageSquare } from "lucide-react";
+import { Building2, Zap, Globe, TrendingUp, Brain, MessageSquare, Leaf, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -9,6 +9,8 @@ const iconMap: Record<string, React.ElementType> = {
   TrendingUp,
   Brain,
   MessageSquare,
+  Leaf,
+  BarChart3,
 };
 
 interface Props {
@@ -20,6 +22,8 @@ const actionKeys = [
   { id: "products", icon: "Zap" },
   { id: "cases", icon: "Globe" },
   { id: "trends", icon: "TrendingUp" },
+  { id: "esg", icon: "Leaf" },
+  { id: "carbon", icon: "BarChart3" },
   { id: "ai", icon: "Brain" },
   { id: "contact", icon: "MessageSquare" },
 ];

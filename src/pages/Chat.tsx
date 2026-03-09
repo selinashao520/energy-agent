@@ -49,6 +49,41 @@ const Chat = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  const searchAndChat = async (query: string, allMessages: Msg[]) => {
+    // Call tavily-search edge function
+    const searchUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tavily-search`;
+    try {
+      const res = await fetch(searchUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ query, maxResults: 5 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        let searchContext = `\n\n[实时搜索结果]\n`;
+        if (data.answer) searchContext += `摘要: ${data.answer}\n\n`;
+        if (data.results?.length) {
+          data.results.forEach((r: any, i: number) => {
+            searchContext += `${i + 1}. ${r.title}\n   ${r.content}\n   来源: ${r.url}\n\n`;
+          });
+        }
+        // Inject search results into the last user message for the AI
+        const enrichedMessages = allMessages.map((m, i) =>
+          i === allMessages.length - 1 && m.role === 'user'
+            ? { ...m, content: m.content + searchContext }
+            : m
+        );
+        return enrichedMessages;
+      }
+    } catch (e) {
+      console.error('Search failed:', e);
+    }
+    return allMessages;
+  };
+
   const sendMessage = async (input: string) => {
     if (isLoading) return;
 
@@ -57,10 +92,20 @@ const Chat = () => {
       return;
     }
 
+    const isSearch = input.startsWith("__SEARCH__");
+    const displayText = isSearch ? input.replace("__SEARCH__", "") : input;
+
     setShowQuickActions(false);
-    const userMsg: Msg = { role: "user", content: input };
+    const userMsg: Msg = { role: "user", content: displayText };
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
+
+    let chatMessages = [...messages, userMsg];
+
+    // If search query, enrich with Tavily results
+    if (isSearch) {
+      chatMessages = await searchAndChat(displayText, chatMessages);
+    }
 
     let assistantSoFar = "";
     const upsertAssistant = (chunk: string) => {
@@ -77,7 +122,7 @@ const Chat = () => {
     };
 
     await streamChat({
-      messages: [...messages, userMsg],
+      messages: chatMessages,
       lang,
       onDelta: upsertAssistant,
       onDone: () => {
