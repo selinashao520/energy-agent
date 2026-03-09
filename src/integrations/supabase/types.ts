@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      visitors: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address: string
+          name: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
